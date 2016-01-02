@@ -56,7 +56,8 @@ public class Editor extends JPanel{
 	}
 	
 	public void click(int mb){
-		
+		if(mb == 1){
+                    for(int j = 0;j < World.worldHeight;
 	}
 	
 	public void define(){
