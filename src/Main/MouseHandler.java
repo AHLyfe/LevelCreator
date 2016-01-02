@@ -15,13 +15,11 @@ public class MouseHandler implements MouseListener, MouseMotionListener {
 	@Override
 	public void mouseMoved(MouseEvent me) {
 		Editor.mse = me.getPoint(); 
-		System.out.println(Editor.mse);
 	}
 
 	@Override
 	public void mouseClicked(MouseEvent me) {
-		System.out.println("?");
-		System.out.println(Editor.mse);
+		Editor.click(me.getButton());
 	}
 
 	@Override

@@ -3,27 +3,35 @@ package Main;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 public class Editor extends JPanel{
 	static Point mse;
 	
-	int worldWidth, worldHeight = 18;
+	static int worldWidth;
+
+	static int worldHeight = 18;
 	int myWidth, myHeight;
+	static int x1, y1, x2, y2;
+	static boolean rightClicked = false;
 	
 	boolean first = true;
 	
 	final static int blockSize = 16;
 	
-	Block[][] blocks;
+	static Block[][] blocks;
 	
-	Rectangle[] menuButtons;
+	static Rectangle[] menuButtons;
 	
-	int ID = 0;
+	static int selectedID = 0;
+	
+	Image saveIcon;
 	
 	public Editor(int worldWidth){
 		this.worldWidth = worldWidth;
@@ -43,7 +51,7 @@ public class Editor extends JPanel{
 			define();
 			first = false;
 		}
-		g.setColor(Color.white);
+		g.setColor(new Color(200,200,200));
 		g.fillRect(0, 0, myWidth, myHeight);
 		
 		for(int j = 0;j < worldHeight;j++){
@@ -55,15 +63,75 @@ public class Editor extends JPanel{
 		drawMenu(g);
 	}
 	
-	public void click(int mb){
+	public static void click(int mb){
+		System.out.println(mb);
 		if(mb == 1){
-                    for(int j = 0;j < worldHeight;j++){
-                        for(int i = 0;i < worldWidth;i++){
-                      if(blocks[i][j].contains(GamePanel.mse){
-                       blocks[i][j].ID = selectedID;}
-                   
-                  }
-             }
+			for(int j = 0;j < worldHeight;j++){
+				for(int i = 0;i < worldWidth;i++){
+					if(blocks[i][j].contains(mse)){
+						blocks[i][j].ID = selectedID;
+						System.out.println(i + "   " + j);
+					}
+				}
+			}
+			for(int i = 0;i < Block.squareColor.length;i++){
+				if(menuButtons[i].contains(mse)){
+					selectedID = i;
+					System.out.println(i);
+				}
+			}
+			if(menuButtons[menuButtons.length-1].contains(mse)){
+				FileHandler.save();
+			}
+		}
+		else if(mb==3){
+			if(!rightClicked){
+				for(int j = 0;j < worldHeight;j++){
+					for(int i = 0;i < worldWidth;i++){
+						if(blocks[i][j].contains(mse)){
+							x1 = i;
+							y1 = j;
+							rightClicked=true;
+							blocks[i][j].selected = true;
+							break;
+						}
+					}
+				}
+			}
+			else if(rightClicked){
+				for(int j = 0;j < worldHeight;j++){
+					for(int i = 0;i < worldWidth;i++){
+						if(blocks[i][j].contains(mse)){
+							x2 = i;
+							y2 = j;
+							setSelection();
+							rightClicked = false;
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	public static void setSelection(){
+		if(x2 > x1){
+			int tempx = x1;
+			x1 = x2;
+			x2 = tempx;
+		}
+		if(y2 > y1){
+			int tempy = y1;
+			y1 = y2;
+			y2 = tempy;
+		}
+		
+		for(int j = y2;j<=y1;j++){
+			for(int i = x2;i<=x1;i++){
+				blocks[i][j].ID = selectedID;
+				blocks[i][j].selected = false;
+			}
+		}
 	}
 	
 	public void define(){
@@ -78,6 +146,9 @@ public class Editor extends JPanel{
 				blocks[i][j] = new Block(i,j);
 			}
 		}
+		
+		saveIcon = new ImageIcon("res/save.png").getImage();
+		
 		//Set focusable so mouseMotionListener and keyListener can detect and focus on panel
 		this.setFocusable(true);
 		this.requestFocusInWindow();
@@ -92,10 +163,11 @@ public class Editor extends JPanel{
 	}
 	
 	void drawMenu(Graphics g){
-		g.setColor(Color.white);
-		g.fillRect(0, menuButtons[0].y, blockSize, blockSize);
+		for(int i = 0;i < Block.squareColor.length;i++){
+			g.setColor(Block.squareColor[i]);
+			g.fillRect(0, menuButtons[i].y, blockSize, blockSize);
+		}
 		
-		g.setColor(Color.black);
-		g.fillRect(0, menuButtons[1].y, blockSize, blockSize);
+		g.drawImage(saveIcon, menuButtons[menuButtons.length-1].x, menuButtons[menuButtons.length-1].y, blockSize, blockSize, null);
 	}
 }
