@@ -57,7 +57,13 @@ public class Editor extends JPanel{
 	
 	public void click(int mb){
 		if(mb == 1){
-                    for(int j = 0;j < World.worldHeight;
+                    for(int j = 0;j < worldHeight;j++){
+                        for(int i = 0;i < worldWidth;i++){
+                      if(blocks[i][j].contains(GamePanel.mse){
+                       blocks[i][j].ID = selectedID;}
+                   
+                  }
+             }
 	}
 	
 	public void define(){
