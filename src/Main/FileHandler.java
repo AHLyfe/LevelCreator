@@ -7,8 +7,6 @@ import java.io.PrintWriter;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class FileHandler {
 	static PrintWriter writer;
@@ -37,6 +35,7 @@ public class FileHandler {
 			e.printStackTrace();
 		}
 		writer.println(Editor.worldWidth);
+		writer.close();
 		
 		System.out.println("Level saved");
 	}
@@ -46,7 +45,6 @@ public class FileHandler {
 		
 		JFileChooser jFileChooser = new JFileChooser();
 		jFileChooser.setCurrentDirectory(new File("/User/" + System.getProperty("user.name")));
-		jFileChooser.setFileFilter(new FileNameExtensionFilter(".level", ".level"));
 		
 		int result = jFileChooser.showOpenDialog(new JFrame("Choose File"));
 		
@@ -54,6 +52,8 @@ public class FileHandler {
             selectedFile = jFileChooser.getSelectedFile();
             System.out.println("Selected file: " + selectedFile.getAbsolutePath());	
 		}
+		
+		selectedFile = new File(selectedFile.getAbsolutePath() + ".level");
 
 		return selectedFile;
 	}
