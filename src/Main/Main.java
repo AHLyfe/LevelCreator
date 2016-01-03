@@ -28,7 +28,7 @@ public class Main {
 	}
 	
 	public static void createFrame(){
-		frame = new JFrame("Level Creator");
+		frame = new JFrame("Level Editor");
 		frame.setSize(size);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLocationRelativeTo(null);

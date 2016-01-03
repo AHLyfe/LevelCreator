@@ -6,10 +6,15 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Scrollbar;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+
+import javafx.scene.control.ScrollBar;
 
 public class Editor extends JPanel{
 	static Point mse;
@@ -22,6 +27,7 @@ public class Editor extends JPanel{
 	static boolean rightClicked = false;
 	
 	boolean first = true;
+	static boolean load = false;
 	
 	final static int blockSize = 16;
 	
@@ -33,12 +39,30 @@ public class Editor extends JPanel{
 	
 	Image saveIcon;
 	
+	public Editor(){
+		this.setName("Editor");
+		if(worldWidth < 64){
+			Main.panel.setPreferredSize(new Dimension((worldWidth+2)*blockSize, worldHeight*blockSize));
+		}
+		else{
+			Main.panel.setPreferredSize(new Dimension((64+2)*blockSize, (worldHeight+1)*blockSize));
+		}
+		Main.frame.pack();
+		
+		this.addMouseListener(new MouseHandler());
+		this.addMouseMotionListener(new MouseHandler());
+	}
+	
 	public Editor(int worldWidth){
-		this.worldWidth = worldWidth;
+		Editor.worldWidth = worldWidth;
 		
 		this.setName("Editor");
-		
-		Main.panel.setPreferredSize(new Dimension((worldWidth+2)*blockSize, worldHeight*blockSize));
+		if(worldWidth < 64){
+			Main.panel.setPreferredSize(new Dimension((worldWidth+2)*blockSize, worldHeight*blockSize));
+		}
+		else{
+			Main.panel.setPreferredSize(new Dimension((64+2)*blockSize, (worldHeight+1)*blockSize));
+		}
 		Main.frame.pack();
 		
 		this.addMouseListener(new MouseHandler());
@@ -51,14 +75,14 @@ public class Editor extends JPanel{
 			define();
 			first = false;
 		}
-		g.setColor(new Color(200,200,200));
-		g.fillRect(0, 0, myWidth, myHeight);
 		
 		for(int j = 0;j < worldHeight;j++){
 			for(int i = 0;i < worldWidth;i++){
 				blocks[i][j].draw(g);
 			}
 		}
+		g.setColor(new Color(200,200,200));
+		g.fillRect(0, 0, 2*blockSize, myHeight - blockSize);
 		
 		drawMenu(g);
 	}
@@ -66,11 +90,13 @@ public class Editor extends JPanel{
 	public static void click(int mb){
 		System.out.println(mb);
 		if(mb == 1){
-			for(int j = 0;j < worldHeight;j++){
-				for(int i = 0;i < worldWidth;i++){
-					if(blocks[i][j].contains(mse)){
-						blocks[i][j].ID = selectedID;
-						System.out.println(i + "   " + j);
+			if(mse.getX()>blockSize*2){
+				for(int j = 0;j < worldHeight;j++){
+					for(int i = 0;i < worldWidth;i++){
+						if(blocks[i][j].contains(mse)){
+							blocks[i][j].ID = selectedID;
+							System.out.println(i + "   " + j);
+						}
 					}
 				}
 			}
@@ -134,24 +160,56 @@ public class Editor extends JPanel{
 		}
 	}
 	
+	public void updateBlocks(int offset){
+		System.out.println(offset);
+		
+		for(int j = 0;j < worldHeight;j++){
+			for(int i  = 0;i < worldWidth;i++){
+				blocks[i][j].x = (blocks[i][j].xCo+2)*blockSize - offset*blockSize;
+			}
+		}
+	}
+	
 	public void define(){
 		myWidth = getWidth();
 		myHeight = getHeight();
 		
 		initialiseMenu();
 		
+		if(!load){
+			defineBlocks();
+		}
+		
+		saveIcon = new ImageIcon("res/save.png").getImage();
+		
+		if(worldWidth > 64){
+			Scrollbar sb = new Scrollbar(Scrollbar.HORIZONTAL, 0, 64, 0, worldWidth);
+			sb.setLocation(0, 18*blockSize);
+			System.out.println(sb.getLocation());
+			sb.setPreferredSize(new Dimension(myWidth, blockSize));
+			sb.setSize(myWidth, blockSize);
+			sb.setBackground(new Color(230,230,230));
+			sb.addAdjustmentListener(new AdjustmentListener(){
+				@Override
+				public void adjustmentValueChanged(AdjustmentEvent ae) {
+					updateBlocks(ae.getValue());
+				}
+			});
+			add(sb);
+		}
+		
+		//Set focusable so mouseMotionListener and keyListener can detect and focus on panel
+		this.setFocusable(true);
+		this.requestFocusInWindow();
+	}
+	
+	public static void defineBlocks(){
 		blocks = new Block[worldWidth][worldHeight];
 		for(int j = 0;j < worldHeight;j++){
 			for(int i = 0;i < worldWidth;i++){
 				blocks[i][j] = new Block(i,j);
 			}
 		}
-		
-		saveIcon = new ImageIcon("res/save.png").getImage();
-		
-		//Set focusable so mouseMotionListener and keyListener can detect and focus on panel
-		this.setFocusable(true);
-		this.requestFocusInWindow();
 	}
 	
 	void initialiseMenu(){

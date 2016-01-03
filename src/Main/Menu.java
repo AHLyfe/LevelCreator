@@ -20,12 +20,14 @@ public class Menu extends JPanel implements Runnable, ActionListener{
 	
 	boolean first = true;
 	
+	JButton loadLevel;
 	JButton ok;
 	JLabel levelWidthLabel;
 	JTextField levelWidth;
 	
 	public Menu(){
 		ok = new JButton();
+		loadLevel = new JButton();
 		levelWidthLabel = new JLabel();
 		levelWidth = new JTextField();
 		
@@ -35,8 +37,13 @@ public class Menu extends JPanel implements Runnable, ActionListener{
 		
 		add(levelWidth);
 		
+		loadLevel.setText("Load");
+		loadLevel.addActionListener(this);
+		loadLevel.setActionCommand("load");
 		
-		ok.setText("Ok");
+		add(loadLevel);
+		
+		ok.setText("Create");
 		ok.addActionListener(this);
 		ok.setActionCommand("ok");
 		
@@ -61,6 +68,11 @@ public class Menu extends JPanel implements Runnable, ActionListener{
 				JOptionPane.showMessageDialog(this, "You have not entered a valid integer");
 			}
 		}	
+		else if(ae.getActionCommand().equals("load")){
+			FileHandler.load();
+			Editor.load = true;
+			Main.setComponent(new Editor());
+		}
 	}
 	
 	public static boolean isNumeric(String str)  
